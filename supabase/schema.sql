@@ -139,6 +139,7 @@ alter table tasks         enable row level security;
 alter table comments      enable row level security;
 alter table profiles      enable row level security;
 
+
 -- ---------- 5. POLICIES ----------
 
 -- profiles: anyone authenticated can read (needed for names/avatars); edit own only
@@ -195,3 +196,6 @@ create policy "comments_insert" on comments for insert
   to authenticated with check (can_access_task(task_id) and user_id = (select auth.uid()));
 create policy "comments_delete_own" on comments for delete
   to authenticated using (user_id = (select auth.uid()));
+
+alter table tasks alter column created_by set default auth.uid();
+alter table comments alter column user_id set default auth.uid();
