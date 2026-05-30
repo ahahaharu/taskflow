@@ -3,6 +3,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
 import { BoardsPage } from "@/pages/BoardsPage";
+import { BoardPage } from "@/pages/BoardPage";
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
 
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<BoardsPage />} />
+        <Route path="/boards/:boardId" element={<BoardPage />} />
       </Route>
     </Routes>
   );

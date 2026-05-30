@@ -151,7 +151,8 @@ create policy "profiles_update_own" on profiles for update
 
 -- boards
 create policy "boards_select_member" on boards for select
-  to authenticated using (is_board_member(id));
+  to authenticated
+  using (owner_id = (select auth.uid()) or is_board_member(id));
 create policy "boards_insert_own" on boards for insert
   to authenticated with check (owner_id = (select auth.uid()));
 create policy "boards_update_owner" on boards for update
