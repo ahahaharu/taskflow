@@ -24,3 +24,13 @@ export async function deleteBoard(id: string): Promise<void> {
   const { error } = await supabase.from("boards").delete().eq("id", id);
   if (error) throw error;
 }
+
+export async function getBoard(id: string): Promise<Board> {
+  const { data, error } = await supabase
+    .from("boards")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (error) throw error;
+  return data;
+}

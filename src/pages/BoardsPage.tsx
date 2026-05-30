@@ -11,7 +11,7 @@ export function BoardsPage() {
 
   return (
     <div className="mx-auto max-w-5xl p-6">
-      <header className="mb-8 flex items-center justify-between">
+      <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">My boards</h1>
           <p className="text-sm text-slate-500">{user?.email}</p>

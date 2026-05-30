@@ -50,7 +50,7 @@ export function Column({
   }
 
   return (
-    <div className="flex w-72 shrink-0 flex-col rounded-xl bg-slate-100 p-3">
+    <div className="flex w-[80vw] max-w-72 shrink-0 flex-col rounded-xl bg-slate-100 p-3 sm:w-72">
       <div className="mb-3 flex items-center justify-between gap-2">
         {editing ? (
           <input
@@ -83,7 +83,10 @@ export function Column({
         </button>
       </div>
 
-      <div ref={setNodeRef} className="flex min-h-2 flex-1 flex-col gap-2">
+      <div
+        ref={setNodeRef}
+        className="flex min-h-2 flex-1 flex-col gap-2 overflow-y-auto"
+      >
         <SortableContext
           items={tasks.map((t) => t.id)}
           strategy={verticalListSortingStrategy}

@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { getBoards, createBoard, deleteBoard } from "@/services/boards";
+import {
+  getBoards,
+  createBoard,
+  deleteBoard,
+  getBoard,
+} from "@/services/boards";
 
 export function useBoards() {
   return useQuery({ queryKey: ["boards"], queryFn: getBoards });
@@ -28,4 +33,8 @@ export function useDeleteBoard() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+}
+
+export function useBoard(id: string) {
+  return useQuery({ queryKey: ["board", id], queryFn: () => getBoard(id) });
 }
