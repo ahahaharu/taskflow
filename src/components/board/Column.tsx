@@ -13,10 +13,12 @@ export function Column({
   column,
   tasks,
   boardId,
+  onTaskClick,
 }: {
   column: ColumnType;
   tasks: Task[];
   boardId: string;
+  onTaskClick: (task: Task) => void;
 }) {
   const { setNodeRef } = useDroppable({ id: column.id });
   const renameColumn = useRenameColumn(boardId);
@@ -96,6 +98,7 @@ export function Column({
               key={task.id}
               task={task}
               onDelete={(id) => deleteTask.mutate(id)}
+              onClick={onTaskClick}
             />
           ))}
         </SortableContext>

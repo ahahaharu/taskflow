@@ -1,14 +1,20 @@
 -- ============================================================
 -- TaskFlow — schema, helpers, triggers, RLS
--- Run once in Supabase SQL Editor
+-- Run once in Supabase SQL Editor on a fresh project
 -- ============================================================
 
 -- ---------- 1. TABLES ----------
 create table boards (
   id          uuid primary key default gen_random_uuid(),
   title       text not null,
-  owner_id    uuid not null references auth.users(id) on delete cascade,
+  owner_id    uuid not null references auth.users(id) on delete cascade default auth.uid(),
   created_at  timestamptz default now()
+);
+
+create table profiles (
+  id         uuid primary key references auth.users(id) on delete cascade,
+  name       text,
+  avatar_url text
 );
 
 create table board_members (
@@ -16,7 +22,10 @@ create table board_members (
   board_id  uuid not null references boards(id) on delete cascade,
   user_id   uuid not null references auth.users(id) on delete cascade,
   role      text not null default 'member' check (role in ('owner', 'member')),
-  unique(board_id, user_id)
+  unique(board_id, user_id),
+  -- link to profiles (same id as auth.users) so we can join member -> profile
+  constraint board_members_profile_fk
+    foreign key (user_id) references profiles(id) on delete cascade
 );
 
 create table columns (
@@ -35,22 +44,16 @@ create table tasks (
   due_date    date,
   assignee_id uuid references auth.users(id),
   position    integer not null default 0,
-  created_by  uuid not null references auth.users(id),
+  created_by  uuid not null references auth.users(id) default auth.uid(),
   created_at  timestamptz default now()
 );
 
 create table comments (
   id         uuid primary key default gen_random_uuid(),
   task_id    uuid not null references tasks(id) on delete cascade,
-  user_id    uuid not null references auth.users(id) on delete cascade,
+  user_id    uuid not null references auth.users(id) on delete cascade default auth.uid(),
   content    text not null,
   created_at timestamptz default now()
-);
-
-create table profiles (
-  id         uuid primary key references auth.users(id) on delete cascade,
-  name       text,
-  avatar_url text
 );
 
 -- Indexes for FKs / common queries
@@ -90,14 +93,14 @@ create or replace function public.can_access_task(_task_id uuid)
 returns boolean language sql security definer set search_path = public stable as $$
   select exists (
     select 1 from tasks t
-    join columns c       on c.id = t.column_id
+    join columns c        on c.id = t.column_id
     join board_members bm on bm.board_id = c.board_id
     where t.id = _task_id and bm.user_id = (select auth.uid())
   );
 $$;
 
 -- ---------- 3. TRIGGERS ----------
--- Auto-create a profile row on signup
+-- Auto-create a profile row on signup (name comes from signUp metadata)
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
@@ -139,10 +142,9 @@ alter table tasks         enable row level security;
 alter table comments      enable row level security;
 alter table profiles      enable row level security;
 
-
 -- ---------- 5. POLICIES ----------
 
--- profiles: anyone authenticated can read (needed for names/avatars); edit own only
+-- profiles: any authenticated user can read (needed for names/avatars); edit own only
 create policy "profiles_select" on profiles for select
   to authenticated using (true);
 create policy "profiles_insert_own" on profiles for insert
@@ -150,10 +152,9 @@ create policy "profiles_insert_own" on profiles for insert
 create policy "profiles_update_own" on profiles for update
   to authenticated using (id = (select auth.uid())) with check (id = (select auth.uid()));
 
--- boards
+-- boards (owner sees own board directly; members see boards they belong to)
 create policy "boards_select_member" on boards for select
-  to authenticated
-  using (owner_id = (select auth.uid()) or is_board_member(id));
+  to authenticated using (owner_id = (select auth.uid()) or is_board_member(id));
 create policy "boards_insert_own" on boards for insert
   to authenticated with check (owner_id = (select auth.uid()));
 create policy "boards_update_owner" on boards for update
@@ -196,6 +197,3 @@ create policy "comments_insert" on comments for insert
   to authenticated with check (can_access_task(task_id) and user_id = (select auth.uid()));
 create policy "comments_delete_own" on comments for delete
   to authenticated using (user_id = (select auth.uid()));
-
-alter table tasks alter column created_by set default auth.uid();
-alter table comments alter column user_id set default auth.uid();

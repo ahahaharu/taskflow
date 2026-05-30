@@ -6,9 +6,11 @@ import { TaskCardContent } from "@/components/board/TaskCardContent";
 export function TaskCard({
   task,
   onDelete,
+  onClick,
 }: {
   task: Task;
   onDelete: (id: string) => void;
+  onClick: (task: Task) => void;
 }) {
   const {
     attributes,
@@ -31,6 +33,7 @@ export function TaskCard({
       style={style}
       {...attributes}
       {...listeners}
+      onClick={() => onClick(task)}
       className="cursor-grab touch-none"
     >
       <TaskCardContent task={task} onDelete={onDelete} />

@@ -1,7 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { getTasks, createTask, deleteTask, moveTasks } from "@/services/tasks";
-import type { TaskPositionUpdate } from "@/services/tasks";
+import {
+  getTasks,
+  createTask,
+  deleteTask,
+  moveTasks,
+  updateTask,
+} from "@/services/tasks";
+import type { TaskPositionUpdate, TaskUpdate } from "@/services/tasks";
 import type { Task } from "@/types";
 
 export function useTasks(boardId: string) {
@@ -24,6 +30,19 @@ export function useCreateTask(boardId: string) {
       position: number;
     }) => createTask(columnId, title, position),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks", boardId] }),
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useUpdateTask(boardId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: TaskUpdate }) =>
+      updateTask(id, updates),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["tasks", boardId] });
+      toast.success("Task updated");
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 }

@@ -17,6 +17,7 @@ import { Column } from "@/components/board/Column";
 import { TaskCardContent } from "@/components/board/TaskCardContent";
 import { useCreateColumn } from "@/hooks/useColumns";
 import { useMoveTasks } from "@/hooks/useTasks";
+import { TaskDetailModal } from "../task/TaskDetailModal";
 
 export function BoardView({
   boardId,
@@ -32,6 +33,7 @@ export function BoardView({
   const createColumn = useCreateColumn(boardId);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [newColumn, setNewColumn] = useState("");
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -125,6 +127,7 @@ export function BoardView({
             column={column}
             tasks={tasksFor(tasks, column.id)}
             boardId={boardId}
+            onTaskClick={setSelectedTask}
           />
         ))}
 
@@ -142,6 +145,11 @@ export function BoardView({
       <DragOverlay dropAnimation={null}>
         {activeTask ? <TaskCardContent task={activeTask} dragging /> : null}
       </DragOverlay>
+      <TaskDetailModal
+        task={selectedTask}
+        boardId={boardId}
+        onClose={() => setSelectedTask(null)}
+      />
     </DndContext>
   );
 }

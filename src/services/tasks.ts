@@ -1,10 +1,18 @@
 import { supabase } from "@/services/supabase";
-import type { Task } from "@/types";
+import type { Priority, Task } from "@/types";
 
 export interface TaskPositionUpdate {
   id: string;
   column_id: string;
   position: number;
+}
+
+export interface TaskUpdate {
+  title?: string;
+  description?: string | null;
+  priority?: Priority;
+  due_date?: string | null;
+  assignee_id?: string | null;
 }
 
 export async function getTasks(boardId: string): Promise<Task[]> {
@@ -29,6 +37,20 @@ export async function createTask(
   const { data, error } = await supabase
     .from("tasks")
     .insert({ column_id: columnId, title, position })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateTask(
+  id: string,
+  updates: TaskUpdate,
+): Promise<Task> {
+  const { data, error } = await supabase
+    .from("tasks")
+    .update(updates)
+    .eq("id", id)
     .select()
     .single();
   if (error) throw error;
