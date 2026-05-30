@@ -1,9 +1,18 @@
-function App() {
+import { Routes, Route } from "react-router-dom";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { LoginPage } from "@/pages/LoginPage";
+import { RegisterPage } from "@/pages/RegisterPage";
+import { BoardsPage } from "@/pages/BoardsPage";
+
+export default function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
-      <h1 className="text-3xl font-bold">TaskFlow — setup OK</h1>
-    </div>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+
+      <Route element={<ProtectedRoute />}>
+        <Route path="/" element={<BoardsPage />} />
+      </Route>
+    </Routes>
   );
 }
-
-export default App;
