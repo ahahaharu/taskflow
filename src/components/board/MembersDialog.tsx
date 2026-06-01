@@ -6,6 +6,8 @@ import {
   useInviteMember,
   useRemoveMember,
 } from "@/hooks/useMembers";
+import { useNavigate } from "react-router-dom";
+import { useDeleteBoard } from "@/hooks/useBoards";
 
 export function MembersDialog({
   boardId,
@@ -30,6 +32,15 @@ export function MembersDialog({
     const trimmed = email.trim();
     if (!trimmed) return;
     invite.mutate(trimmed, { onSuccess: () => setEmail("") });
+  }
+
+  const navigate = useNavigate();
+  const deleteBoard = useDeleteBoard();
+
+  function handleDeleteBoard() {
+    if (confirm("Delete this board and all its data? This cannot be undone.")) {
+      deleteBoard.mutate(boardId, { onSuccess: () => navigate("/") });
+    }
   }
 
   return (
@@ -88,6 +99,18 @@ export function MembersDialog({
           <p className="text-xs text-slate-400">
             Only the owner can manage members.
           </p>
+        )}
+
+        {isOwner && (
+          <div className="mt-2 border-t border-slate-200 pt-4">
+            <button
+              onClick={handleDeleteBoard}
+              disabled={deleteBoard.isPending}
+              className="w-full rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
+            >
+              {deleteBoard.isPending ? "Deleting…" : "Delete board"}
+            </button>
+          </div>
         )}
       </div>
     </Modal>

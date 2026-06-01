@@ -2,9 +2,12 @@ import type { MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import type { Board } from "@/types";
 import { useDeleteBoard } from "@/hooks/useBoards";
+import { useAuth } from "@/hooks/useAuth";
 
 export function BoardCard({ board }: { board: Board }) {
   const deleteBoard = useDeleteBoard();
+  const { user } = useAuth();
+  const isOwner = user?.id === board.owner_id;
 
   function handleDelete(e: MouseEvent) {
     e.preventDefault();
@@ -22,13 +25,15 @@ export function BoardCard({ board }: { board: Board }) {
       <span className="text-xs text-slate-400">
         {new Date(board.created_at).toLocaleDateString()}
       </span>
-      <button
-        onClick={handleDelete}
-        className="absolute right-3 top-3 rounded-md p-1 text-slate-400 opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
-        aria-label="Delete board"
-      >
-        ✕
-      </button>
+      {isOwner && (
+        <button
+          onClick={handleDelete}
+          className="absolute right-3 top-3 rounded-md p-1 text-slate-400 opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
+          aria-label="Delete board"
+        >
+          ✕
+        </button>
+      )}
     </Link>
   );
 }
