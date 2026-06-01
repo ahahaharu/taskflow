@@ -33,7 +33,7 @@ export function BoardView({
   const createColumn = useCreateColumn(boardId);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [newColumn, setNewColumn] = useState("");
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -127,7 +127,7 @@ export function BoardView({
             column={column}
             tasks={tasksFor(tasks, column.id)}
             boardId={boardId}
-            onTaskClick={setSelectedTask}
+            onTaskClick={(task) => setSelectedTaskId(task.id)}
           />
         ))}
 
@@ -146,9 +146,9 @@ export function BoardView({
         {activeTask ? <TaskCardContent task={activeTask} dragging /> : null}
       </DragOverlay>
       <TaskDetailModal
-        task={selectedTask}
+        task={tasks.find((t) => t.id === selectedTaskId) ?? null}
         boardId={boardId}
-        onClose={() => setSelectedTask(null)}
+        onClose={() => setSelectedTaskId(null)}
       />
     </DndContext>
   );
