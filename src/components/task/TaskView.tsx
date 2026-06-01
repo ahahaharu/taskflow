@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useMembers } from "@/hooks/useMembers";
 import { useDeleteTask } from "@/hooks/useTasks";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import type { Task, Priority } from "@/types";
 
 const labelClass = "mb-1 block text-xs font-medium text-slate-500";
@@ -22,14 +24,18 @@ export function TaskView({
 }) {
   const { data: members } = useMembers(boardId);
   const deleteTask = useDeleteTask(boardId);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const assigneeName =
     members?.find((m) => m.id === task.assignee_id)?.name?.trim() || null;
 
-  function handleDelete() {
-    if (confirm("Delete this task?")) {
-      deleteTask.mutate(task.id, { onSuccess: onClose });
-    }
+  function handleConfirmDelete() {
+    deleteTask.mutate(task.id, {
+      onSuccess: () => {
+        setConfirmOpen(false);
+        onClose();
+      },
+    });
   }
 
   return (
@@ -70,7 +76,7 @@ export function TaskView({
 
       <div className="mt-1 flex items-center justify-between">
         <button
-          onClick={handleDelete}
+          onClick={() => setConfirmOpen(true)}
           className="rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50"
         >
           Delete
@@ -90,6 +96,15 @@ export function TaskView({
           </button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete task"
+        message={`Delete task "${task.title}"?`}
+        onConfirm={handleConfirmDelete}
+        onClose={() => setConfirmOpen(false)}
+        loading={deleteTask.isPending}
+      />
     </>
   );
 }

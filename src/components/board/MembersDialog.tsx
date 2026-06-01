@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Modal } from "@/components/shared/Modal";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { useAuth } from "@/hooks/useAuth";
 import {
   useBoardMembersDetailed,
@@ -25,6 +26,7 @@ export function MembersDialog({
   const invite = useInviteMember(boardId);
   const remove = useRemoveMember(boardId);
   const [email, setEmail] = useState("");
+  const [confirmDeleteBoardOpen, setConfirmDeleteBoardOpen] = useState(false);
 
   const isOwner = user?.id === ownerId;
 
@@ -37,13 +39,17 @@ export function MembersDialog({
   const navigate = useNavigate();
   const deleteBoard = useDeleteBoard();
 
-  function handleDeleteBoard() {
-    if (confirm("Delete this board and all its data? This cannot be undone.")) {
-      deleteBoard.mutate(boardId, { onSuccess: () => navigate("/") });
-    }
+  function handleConfirmDeleteBoard() {
+    deleteBoard.mutate(boardId, {
+      onSuccess: () => {
+        setConfirmDeleteBoardOpen(false);
+        navigate("/");
+      },
+    });
   }
 
   return (
+    <>
     <Modal open={open} onClose={onClose} title="Board members">
       <div className="flex flex-col gap-4">
         {isOwner && (
@@ -104,7 +110,7 @@ export function MembersDialog({
         {isOwner && (
           <div className="mt-2 border-t border-slate-200 pt-4">
             <button
-              onClick={handleDeleteBoard}
+              onClick={() => setConfirmDeleteBoardOpen(true)}
               disabled={deleteBoard.isPending}
               className="w-full rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50"
             >
@@ -114,5 +120,14 @@ export function MembersDialog({
         )}
       </div>
     </Modal>
+    <ConfirmDialog
+      open={confirmDeleteBoardOpen}
+      title="Delete board"
+      message="Delete this board and all its data? This cannot be undone."
+      onConfirm={handleConfirmDeleteBoard}
+      onClose={() => setConfirmDeleteBoardOpen(false)}
+      loading={deleteBoard.isPending}
+    />
+    </>
   );
 }

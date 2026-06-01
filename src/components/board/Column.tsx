@@ -6,6 +6,7 @@ import {
 } from "@dnd-kit/sortable";
 import type { Column as ColumnType, Task } from "@/types";
 import { TaskCard } from "@/components/board/TaskCard";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { useRenameColumn, useDeleteColumn } from "@/hooks/useColumns";
 import { useCreateTask, useDeleteTask } from "@/hooks/useTasks";
 import { useMembers } from "@/hooks/useMembers";
@@ -31,6 +32,8 @@ export function Column({
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(column.title);
   const [newTask, setNewTask] = useState("");
+  const [confirmDeleteColumnOpen, setConfirmDeleteColumnOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   function saveTitle() {
     const trimmed = title.trim();
@@ -51,6 +54,19 @@ export function Column({
       position: tasks.length,
     });
     setNewTask("");
+  }
+
+  function confirmDeleteColumn() {
+    deleteColumn.mutate(column.id, {
+      onSuccess: () => setConfirmDeleteColumnOpen(false),
+    });
+  }
+
+  function confirmDeleteTask() {
+    if (!taskToDelete) return;
+    deleteTask.mutate(taskToDelete.id, {
+      onSuccess: () => setTaskToDelete(null),
+    });
   }
 
   return (
@@ -75,11 +91,7 @@ export function Column({
           </h3>
         )}
         <button
-          onClick={() => {
-            if (confirm(`Delete column "${column.title}" and its tasks?`)) {
-              deleteColumn.mutate(column.id);
-            }
-          }}
+          onClick={() => setConfirmDeleteColumnOpen(true)}
           className="shrink-0 rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-red-600"
           aria-label="Delete column"
         >
@@ -99,7 +111,9 @@ export function Column({
             <TaskCard
               key={task.id}
               task={task}
-              onDelete={(id) => deleteTask.mutate(id)}
+              onDelete={(id) =>
+                setTaskToDelete(tasks.find((t) => t.id === id) ?? null)
+              }
               onClick={onTaskClick}
               assignee={members?.find((m) => m.id === task.assignee_id) ?? null}
             />
@@ -113,6 +127,27 @@ export function Column({
         onKeyDown={(e) => e.key === "Enter" && addTask()}
         placeholder="+ Add a task"
         className="mt-2 rounded-lg border border-transparent bg-white/60 px-2 py-1.5 text-sm outline-none placeholder:text-slate-400 focus:border-slate-300 focus:bg-white"
+      />
+
+      <ConfirmDialog
+        open={confirmDeleteColumnOpen}
+        title="Delete column"
+        message={`Delete column "${column.title}" and all of its tasks?`}
+        onConfirm={confirmDeleteColumn}
+        onClose={() => setConfirmDeleteColumnOpen(false)}
+        loading={deleteColumn.isPending}
+      />
+      <ConfirmDialog
+        open={taskToDelete !== null}
+        title="Delete task"
+        message={
+          taskToDelete
+            ? `Delete task "${taskToDelete.title}"?`
+            : "Delete this task?"
+        }
+        onConfirm={confirmDeleteTask}
+        onClose={() => setTaskToDelete(null)}
+        loading={deleteTask.isPending}
       />
     </div>
   );
