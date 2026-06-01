@@ -202,3 +202,43 @@ create policy "comments_delete_own" on comments for delete
 alter publication supabase_realtime add table tasks;
 alter publication supabase_realtime add table columns;
 alter publication supabase_realtime add table comments;
+
+-- ---------- 7. RPC ----------
+-- Invite a user to a board by email. Returns a status string.
+-- security definer: needs to read auth.users (email) and insert membership.
+create or replace function public.invite_member(_board_id uuid, _email text)
+returns text
+language plpgsql
+security definer
+set search_path = public, auth
+as $$
+declare
+  _caller uuid := auth.uid();
+  _target uuid;
+begin
+  -- only the board owner may invite
+  if not exists (
+    select 1 from boards where id = _board_id and owner_id = _caller
+  ) then
+    return 'not_owner';
+  end if;
+
+  -- find the user by email (case-insensitive)
+  select id into _target from auth.users where lower(email) = lower(_email);
+  if _target is null then
+    return 'user_not_found';
+  end if;
+
+  -- already a member?
+  if exists (
+    select 1 from board_members where board_id = _board_id and user_id = _target
+  ) then
+    return 'already_member';
+  end if;
+
+  insert into board_members (board_id, user_id, role)
+  values (_board_id, _target, 'member');
+
+  return 'ok';
+end;
+$$;
