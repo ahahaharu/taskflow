@@ -5,12 +5,14 @@ import {
   useDeleteComment,
 } from "@/hooks/useComments";
 import { useAuth } from "@/hooks/useAuth";
+import { useRealtimeComments } from "@/hooks/useRealtimeComments";
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleString();
 }
 
 export function Comments({ taskId }: { taskId: string }) {
+  useRealtimeComments(taskId);
   const { user } = useAuth();
   const { data: comments, isLoading } = useComments(taskId);
   const addComment = useAddComment(taskId);

@@ -197,3 +197,8 @@ create policy "comments_insert" on comments for insert
   to authenticated with check (can_access_task(task_id) and user_id = (select auth.uid()));
 create policy "comments_delete_own" on comments for delete
   to authenticated using (user_id = (select auth.uid()));
+
+-- ---------- 6. REALTIME ----------
+alter publication supabase_realtime add table tasks;
+alter publication supabase_realtime add table columns;
+alter publication supabase_realtime add table comments;

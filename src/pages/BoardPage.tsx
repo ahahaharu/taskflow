@@ -4,12 +4,15 @@ import { useColumns } from "@/hooks/useColumns";
 import { useTasks } from "@/hooks/useTasks";
 import { BoardView } from "@/components/board/BoardView";
 import { Spinner } from "@/components/shared/Spinner";
+import { useRealtimeBoard } from "@/hooks/useRealtimeBoard";
 
 export function BoardPage() {
   const { boardId } = useParams<{ boardId: string }>();
   const board = useBoard(boardId!);
   const columns = useColumns(boardId!);
   const tasks = useTasks(boardId!);
+
+  useRealtimeBoard(boardId!);
 
   if (board.isLoading || columns.isLoading || tasks.isLoading)
     return <Spinner fullScreen />;
