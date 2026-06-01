@@ -3,6 +3,7 @@ import { Modal } from "@/components/shared/Modal";
 import { useUpdateTask, useDeleteTask } from "@/hooks/useTasks";
 import { useMembers } from "@/hooks/useMembers";
 import type { Task, Priority } from "@/types";
+import { Comments } from "@/components/task/Comments";
 
 const priorities: Priority[] = ["low", "medium", "high"];
 const fieldClass =
@@ -44,7 +45,6 @@ function TaskDetailForm({
   const deleteTask = useDeleteTask(boardId);
   const { data: members } = useMembers(boardId);
 
-  // initialised once from the task; key on the parent resets this on task change
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
   const [priority, setPriority] = useState<Priority>(task.priority);
@@ -171,6 +171,7 @@ function TaskDetailForm({
           </button>
         </div>
       </div>
+      <Comments taskId={task.id} />
     </div>
   );
 }
