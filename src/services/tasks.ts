@@ -16,17 +16,24 @@ export interface TaskUpdate {
 }
 
 export async function getTasks(boardId: string): Promise<Task[]> {
+  const { data: columns, error: colErr } = await supabase
+    .from("columns")
+    .select("id")
+    .eq("board_id", boardId);
+  if (colErr) throw colErr;
+
+  const columnIds = (columns ?? []).map((c) => c.id);
+  if (columnIds.length === 0) return [];
+
   const { data, error } = await supabase
     .from("tasks")
-    .select("*, columns!inner(board_id)")
-    .eq("columns.board_id", boardId)
+    .select(
+      "id, column_id, title, description, priority, due_date, assignee_id, position, created_by, created_at",
+    )
+    .in("column_id", columnIds)
     .order("position", { ascending: true });
   if (error) throw error;
-  return (data ?? []).map((row) => {
-    const task = { ...row } as Record<string, unknown>;
-    delete task.columns; // strip the join helper field
-    return task as unknown as Task;
-  });
+  return data ?? [];
 }
 
 export async function createTask(

@@ -1,6 +1,10 @@
 import { supabase } from "@/services/supabase";
 
-export async function signUp(email: string, password: string, name: string) {
+export async function signUp(
+  email: string,
+  password: string,
+  name: string,
+): Promise<{ hasSession: boolean }> {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -10,16 +14,15 @@ export async function signUp(email: string, password: string, name: string) {
   return { hasSession: Boolean(data.session) };
 }
 
-export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
+export async function signIn(email: string, password: string): Promise<void> {
+  const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
   if (error) throw error;
-  return data;
 }
 
-export async function signOut() {
+export async function signOut(): Promise<void> {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
 }
