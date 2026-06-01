@@ -6,6 +6,7 @@ import {
 } from "@/hooks/useComments";
 import { useAuth } from "@/hooks/useAuth";
 import { useRealtimeComments } from "@/hooks/useRealtimeComments";
+import { Avatar } from "@/components/shared/Avatar";
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleString();
@@ -37,6 +38,11 @@ export function Comments({ taskId }: { taskId: string }) {
         )}
         {comments?.map((c) => (
           <div key={c.id} className="group flex gap-2 text-sm">
+            <Avatar
+              name={c.author?.name}
+              url={c.author?.avatar_url}
+              size="sm"
+            />
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <span className="font-medium text-slate-700">

@@ -1,16 +1,18 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { Task } from "@/types";
 import { TaskCardContent } from "@/components/board/TaskCardContent";
+import type { Task, Profile } from "@/types";
 
 export function TaskCard({
   task,
   onDelete,
   onClick,
+  assignee,
 }: {
   task: Task;
   onDelete: (id: string) => void;
   onClick: (task: Task) => void;
+  assignee?: Profile | null;
 }) {
   const {
     attributes,
@@ -36,7 +38,7 @@ export function TaskCard({
       onClick={() => onClick(task)}
       className="cursor-grab touch-none"
     >
-      <TaskCardContent task={task} onDelete={onDelete} />
+      <TaskCardContent task={task} onDelete={onDelete} assignee={assignee} />
     </div>
   );
 }

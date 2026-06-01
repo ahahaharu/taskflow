@@ -6,6 +6,7 @@ import { RegisterPage } from "@/pages/RegisterPage";
 import { BoardsPage } from "@/pages/BoardsPage";
 import { BoardPage } from "@/pages/BoardPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
+import { ProfilePage } from "./pages/ProfilePage";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<BoardsPage />} />
         <Route path="/boards/:boardId" element={<BoardPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

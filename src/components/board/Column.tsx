@@ -8,6 +8,7 @@ import type { Column as ColumnType, Task } from "@/types";
 import { TaskCard } from "@/components/board/TaskCard";
 import { useRenameColumn, useDeleteColumn } from "@/hooks/useColumns";
 import { useCreateTask, useDeleteTask } from "@/hooks/useTasks";
+import { useMembers } from "@/hooks/useMembers";
 
 export function Column({
   column,
@@ -25,6 +26,7 @@ export function Column({
   const deleteColumn = useDeleteColumn(boardId);
   const createTask = useCreateTask(boardId);
   const deleteTask = useDeleteTask(boardId);
+  const { data: members } = useMembers(boardId);
 
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(column.title);
@@ -99,6 +101,7 @@ export function Column({
               task={task}
               onDelete={(id) => deleteTask.mutate(id)}
               onClick={onTaskClick}
+              assignee={members?.find((m) => m.id === task.assignee_id) ?? null}
             />
           ))}
         </SortableContext>

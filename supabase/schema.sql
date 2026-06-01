@@ -242,3 +242,15 @@ begin
   return 'ok';
 end;
 $$;
+
+-- ---------- 8. STORAGE ----------
+-- allow authenticated users to upload/update their own avatar (path: <uid>/...)
+create policy "avatar_upload_own"
+  on storage.objects for insert
+  to authenticated
+  with check (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+create policy "avatar_update_own"
+  on storage.objects for update
+  to authenticated
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);

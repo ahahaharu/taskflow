@@ -4,6 +4,7 @@ import { useBoards } from "@/hooks/useBoards";
 import { BoardCard } from "@/components/board/BoardCard";
 import { CreateBoardDialog } from "@/components/board/CreateBoardDialog";
 import { Spinner } from "@/components/shared/Spinner";
+import { Link } from "react-router-dom";
 
 export function BoardsPage() {
   const { user } = useAuth();
@@ -24,6 +25,12 @@ export function BoardsPage() {
           >
             Sign out
           </button>
+          <Link
+            to="/profile"
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-100"
+          >
+            Profile
+          </Link>
         </div>
       </header>
 
