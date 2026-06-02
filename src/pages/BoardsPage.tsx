@@ -5,6 +5,7 @@ import { useBoards } from "@/hooks/useBoards";
 import { BoardCard } from "@/components/board/BoardCard";
 import { CreateBoardDialog } from "@/components/board/CreateBoardDialog";
 import { Spinner } from "@/components/shared/Spinner";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 export function BoardsPage() {
   const { data: boards, isLoading, isError } = useBoards();
@@ -17,6 +18,7 @@ export function BoardsPage() {
             TaskFlow
           </h1>
           <nav className="flex items-center gap-1">
+            <ThemeToggle />
             <Link
               to="/profile"
               className="flex items-center gap-1.5 rounded-control px-3 py-1.5 text-sm text-ink-2 transition-colors duration-150 hover:bg-surface-2 hover:text-ink"

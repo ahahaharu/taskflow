@@ -114,7 +114,7 @@ export function MembersDialog({
                       <span
                         className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium capitalize ${
                           isOwnerRole
-                            ? "bg-[#f4ead8] text-accent-hover"
+                            ? "bg-prio-med-bg text-prio-med-ink"
                             : "bg-surface-2 text-ink-2"
                         }`}
                       >

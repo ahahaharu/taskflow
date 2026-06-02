@@ -13,6 +13,7 @@ import { emptyFilters, type BoardFilters } from "@/types/filters";
 import { filterTasks } from "@/utils/filterTasks";
 import { useMembers } from "@/hooks/useMembers";
 import { ActivityPanel } from "@/components/board/ActivityPanel";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 export function BoardPage() {
   const { boardId } = useParams<{ boardId: string }>();
@@ -57,6 +58,7 @@ export function BoardPage() {
             </h1>
           </div>
           <div className="flex shrink-0 items-center gap-1">
+            <ThemeToggle />
             <button
               onClick={() => setActivityOpen(true)}
               className="flex items-center gap-1.5 rounded-control px-3 py-1.5 text-sm text-ink-2 transition-colors duration-150 hover:bg-surface-2 hover:text-ink"

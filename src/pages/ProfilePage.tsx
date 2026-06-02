@@ -77,7 +77,7 @@ function ProfileForm({
       >
         <Avatar name={profile?.name} url={profile?.avatar_url} size="lg" />
         <span
-          className={`absolute inset-0 flex items-center justify-center gap-1.5 rounded-full bg-ink/55 text-xs font-medium text-white transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 ${
+          className={`absolute inset-0 flex items-center justify-center gap-1.5 rounded-full bg-black/55 text-xs font-medium text-white transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 ${
             uploadAvatar.isPending ? "opacity-100" : "opacity-0"
           }`}
         >
