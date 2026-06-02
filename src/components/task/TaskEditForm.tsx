@@ -5,8 +5,9 @@ import type { Task, Priority } from "@/types";
 
 const priorities: Priority[] = ["low", "medium", "high"];
 const fieldClass =
-  "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500";
-const labelClass = "mb-1 block text-xs font-medium text-slate-500";
+  "w-full rounded-control border border-line bg-card px-3 py-2 text-sm text-ink placeholder:text-ink-muted outline-none transition-colors duration-150 focus:border-line-strong focus:ring-2 focus:ring-accent/15";
+const labelClass =
+  "mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-ink-muted";
 
 export function TaskEditForm({
   task,
@@ -38,7 +39,7 @@ export function TaskEditForm({
           assignee_id: assignee || null,
         },
       },
-      { onSuccess: onDone }, // back to view; cache invalidation refreshes the data
+      { onSuccess: onDone },
     );
   }
 
@@ -60,7 +61,7 @@ export function TaskEditForm({
           onChange={(e) => setDescription(e.target.value)}
           rows={4}
           placeholder="Add more detail…"
-          className={`${fieldClass} resize-none`}
+          className={`${fieldClass} resize-none leading-relaxed`}
         />
       </div>
 
@@ -70,7 +71,7 @@ export function TaskEditForm({
           <select
             value={priority}
             onChange={(e) => setPriority(e.target.value as Priority)}
-            className={fieldClass}
+            className={`${fieldClass} capitalize`}
           >
             {priorities.map((p) => (
               <option key={p} value={p}>
@@ -107,17 +108,17 @@ export function TaskEditForm({
         </select>
       </div>
 
-      <div className="mt-2 flex items-center justify-end gap-2">
+      <div className="mt-2 flex items-center justify-end gap-2 border-t border-line pt-4">
         <button
           onClick={onDone}
-          className="rounded-lg px-4 py-2 text-sm text-slate-600 hover:bg-slate-100"
+          className="rounded-control px-4 py-2 text-sm text-ink-2 transition-colors duration-150 hover:bg-surface-2"
         >
           Cancel
         </button>
         <button
           onClick={handleSave}
           disabled={updateTask.isPending}
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+          className="rounded-control bg-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
         >
           {updateTask.isPending ? "Saving…" : "Save"}
         </button>

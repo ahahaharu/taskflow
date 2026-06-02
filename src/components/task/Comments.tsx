@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Trash2, Send } from "lucide-react";
 import {
   useComments,
   useAddComment,
@@ -9,7 +10,12 @@ import { useRealtimeComments } from "@/hooks/useRealtimeComments";
 import { Avatar } from "@/components/shared/Avatar";
 
 function formatTime(iso: string) {
-  return new Date(iso).toLocaleString();
+  return new Date(iso).toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 export function Comments({ taskId }: { taskId: string }) {
@@ -27,40 +33,44 @@ export function Comments({ taskId }: { taskId: string }) {
   }
 
   return (
-    <div className="border-t border-slate-200 pt-4">
-      <h3 className="mb-3 text-xs font-medium text-slate-500">Comments</h3>
+    <div className="border-t border-line pt-4">
+      <h3 className="mb-3 text-[10px] font-medium uppercase tracking-wider text-ink-muted">
+        Comments
+      </h3>
 
-      {isLoading && <p className="text-sm text-slate-400">Loading…</p>}
+      {isLoading && <p className="text-sm text-ink-muted">Loading…</p>}
 
-      <div className="mb-3 flex max-h-48 flex-col gap-3 overflow-y-auto">
+      <div className="mb-4 flex max-h-56 flex-col gap-4 overflow-y-auto pr-1">
         {comments && comments.length === 0 && (
-          <p className="text-sm text-slate-400">No comments yet.</p>
+          <p className="text-sm text-ink-muted">No comments yet.</p>
         )}
         {comments?.map((c) => (
-          <div key={c.id} className="group flex gap-2 text-sm">
+          <div key={c.id} className="group flex gap-2.5 text-sm">
             <Avatar
               name={c.author?.name}
               url={c.author?.avatar_url}
               size="sm"
             />
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-slate-700">
+                <span className="font-medium text-ink">
                   {c.author?.name?.trim() || "Unnamed"}
                 </span>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-ink-muted">
                   {formatTime(c.created_at)}
                 </span>
               </div>
-              <p className="whitespace-pre-wrap text-slate-600">{c.content}</p>
+              <p className="mt-0.5 whitespace-pre-wrap leading-relaxed text-ink-2">
+                {c.content}
+              </p>
             </div>
             {c.user_id === user?.id && (
               <button
                 onClick={() => deleteComment.mutate(c.id)}
-                className="shrink-0 rounded p-0.5 text-slate-300 opacity-0 transition hover:text-red-600 group-hover:opacity-100"
+                className="h-7 shrink-0 rounded p-1 text-ink-muted opacity-0 transition-colors duration-150 hover:text-prio-high-ink group-hover:opacity-100 focus-visible:opacity-100"
                 aria-label="Delete comment"
               >
-                ✕
+                <Trash2 size={13} strokeWidth={2} />
               </button>
             )}
           </div>
@@ -73,14 +83,15 @@ export function Comments({ taskId }: { taskId: string }) {
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
           placeholder="Write a comment…"
-          className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+          className="flex-1 rounded-control border border-line bg-card px-3 py-2 text-sm text-ink placeholder:text-ink-muted outline-none transition-colors duration-150 focus:border-line-strong focus:ring-2 focus:ring-accent/15"
         />
         <button
           onClick={handleAdd}
-          disabled={addComment.isPending}
-          className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+          disabled={addComment.isPending || !text.trim()}
+          className="flex items-center gap-1.5 rounded-control bg-accent px-3 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
+          aria-label="Send"
         >
-          Send
+          <Send size={14} strokeWidth={2} />
         </button>
       </div>
     </div>

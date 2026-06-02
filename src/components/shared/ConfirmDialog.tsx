@@ -1,3 +1,4 @@
+import { AlertTriangle } from "lucide-react";
 import { Modal } from "@/components/shared/Modal";
 
 interface ConfirmDialogProps {
@@ -21,19 +22,24 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Modal open={open} onClose={onClose} title={title}>
-      <p className="text-sm text-slate-600">{message}</p>
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-prio-high-bg text-prio-high-ink">
+          <AlertTriangle size={18} strokeWidth={2} />
+        </div>
+        <p className="pt-1 text-sm text-ink-2">{message}</p>
+      </div>
       <div className="mt-6 flex justify-end gap-2">
         <button
           onClick={onClose}
           disabled={loading}
-          className="rounded-lg px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 disabled:opacity-50"
+          className="rounded-control px-4 py-2 text-sm text-ink-2 transition-colors duration-150 hover:bg-surface-2 disabled:opacity-50"
         >
           Cancel
         </button>
         <button
           onClick={onConfirm}
           disabled={loading}
-          className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+          className="rounded-control bg-danger px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-[#7f1d1d] disabled:opacity-50"
         >
           {loading ? "…" : confirmLabel}
         </button>

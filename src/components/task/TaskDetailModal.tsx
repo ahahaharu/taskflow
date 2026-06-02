@@ -15,7 +15,7 @@ export function TaskDetailModal({
   onClose: () => void;
 }) {
   return (
-    <Modal open={Boolean(task)} onClose={onClose} title="Task details">
+    <Modal open={Boolean(task)} onClose={onClose}>
       {task && (
         <TaskDetailContent
           key={task.id}
@@ -40,7 +40,7 @@ function TaskDetailContent({
   const [editing, setEditing] = useState(false);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5">
       {editing ? (
         <TaskEditForm
           task={task}
