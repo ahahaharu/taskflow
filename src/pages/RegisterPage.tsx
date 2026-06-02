@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { signUp } from "@/services/auth";
+import { GoogleButton } from "@/components/auth/GoogleButton";
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -41,6 +42,14 @@ export function RegisterPage() {
             Create your account
           </h2>
           <AuthForm mode="register" onSubmit={handleRegister} />
+
+          <div className="my-5 flex items-center gap-3">
+            <span className="h-px flex-1 bg-line" />
+            <span className="text-xs text-ink-muted">or</span>
+            <span className="h-px flex-1 bg-line" />
+          </div>
+
+          <GoogleButton />
         </div>
         <p className="mt-5 text-center text-sm text-ink-2">
           Already have an account?{" "}
