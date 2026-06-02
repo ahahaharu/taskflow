@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { ChevronLeft, Users } from "lucide-react";
+import { ChevronLeft, Users, History } from "lucide-react";
 import { useBoard } from "@/hooks/useBoards";
 import { useColumns } from "@/hooks/useColumns";
 import { useTasks } from "@/hooks/useTasks";
@@ -12,6 +12,7 @@ import { BoardToolbar } from "@/components/board/BoardToolbar";
 import { emptyFilters, type BoardFilters } from "@/types/filters";
 import { filterTasks } from "@/utils/filterTasks";
 import { useMembers } from "@/hooks/useMembers";
+import { ActivityPanel } from "@/components/board/ActivityPanel";
 
 export function BoardPage() {
   const { boardId } = useParams<{ boardId: string }>();
@@ -22,6 +23,7 @@ export function BoardPage() {
   useRealtimeBoard(boardId!);
 
   const [membersOpen, setMembersOpen] = useState(false);
+  const [activityOpen, setActivityOpen] = useState(false);
   const members = useMembers(boardId!);
   const [filters, setFilters] = useState<BoardFilters>(emptyFilters);
 
@@ -54,13 +56,22 @@ export function BoardPage() {
               {board.data?.title}
             </h1>
           </div>
-          <button
-            onClick={() => setMembersOpen(true)}
-            className="flex shrink-0 items-center gap-1.5 rounded-control px-3 py-1.5 text-sm text-ink-2 transition-colors duration-150 hover:bg-surface-2 hover:text-ink"
-          >
-            <Users size={15} strokeWidth={2} />
-            <span className="hidden sm:inline">Members</span>
-          </button>
+          <div className="flex shrink-0 items-center gap-1">
+            <button
+              onClick={() => setActivityOpen(true)}
+              className="flex items-center gap-1.5 rounded-control px-3 py-1.5 text-sm text-ink-2 transition-colors duration-150 hover:bg-surface-2 hover:text-ink"
+            >
+              <History size={15} strokeWidth={2} />
+              <span className="hidden sm:inline">Activity</span>
+            </button>
+            <button
+              onClick={() => setMembersOpen(true)}
+              className="flex items-center gap-1.5 rounded-control px-3 py-1.5 text-sm text-ink-2 transition-colors duration-150 hover:bg-surface-2 hover:text-ink"
+            >
+              <Users size={15} strokeWidth={2} />
+              <span className="hidden sm:inline">Members</span>
+            </button>
+          </div>
         </div>
       </header>
       <div className="flex flex-1 flex-col overflow-hidden px-4 py-4 sm:px-6">
@@ -86,6 +97,11 @@ export function BoardPage() {
           onClose={() => setMembersOpen(false)}
         />
       )}
+      <ActivityPanel
+        boardId={boardId!}
+        open={activityOpen}
+        onClose={() => setActivityOpen(false)}
+      />
     </div>
   );
 }

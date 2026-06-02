@@ -52,3 +52,14 @@ export interface Attachment {
   uploaded_by: string;
   created_at: string;
 }
+
+export interface Activity {
+  id: string;
+  board_id: string;
+  user_id: string | null;
+  action: "created" | "moved" | "deleted";
+  task_title: string;
+  from_column: string | null;
+  to_column: string | null;
+  created_at: string;
+}

@@ -278,3 +278,87 @@ create policy "attachments_insert" on attachments for insert
   to authenticated with check (can_access_task(task_id) and uploaded_by = (select auth.uid()));
 create policy "attachments_delete" on attachments for delete
   to authenticated using (uploaded_by = (select auth.uid()) or can_access_task(task_id));
+
+  -- ---------- activity log ----------
+create table activity (
+  id          uuid primary key default gen_random_uuid(),
+  board_id    uuid not null references boards(id) on delete cascade,
+  user_id     uuid references auth.users(id) on delete set null,
+  action      text not null,            -- 'created' | 'moved' | 'deleted'
+  task_title  text not null,
+  from_column text,
+  to_column   text,
+  created_at  timestamptz default now()
+);
+
+create index idx_activity_board on activity(board_id, created_at desc);
+
+alter table activity enable row level security;
+
+-- board members can read the log; inserts happen via triggers (security definer), not clients
+create policy "activity_select" on activity for select
+  to authenticated using (is_board_member(board_id));
+
+-- helper: resolve board_id + column title for a given column
+create or replace function public.column_board(_column_id uuid)
+returns table(board_id uuid, title text)
+language sql security definer set search_path = public stable as $$
+  select board_id, title from columns where id = _column_id;
+$$;
+
+-- log task creation
+create or replace function public.log_task_created()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare cb record;
+begin
+  select * into cb from public.column_board(new.column_id);
+  insert into activity (board_id, user_id, action, task_title, to_column)
+  values (cb.board_id, auth.uid(), 'created', new.title, cb.title);
+  return new;
+end;
+$$;
+
+create trigger on_task_created
+  after insert on tasks
+  for each row execute function public.log_task_created();
+
+-- log task move (only when column actually changes)
+create or replace function public.log_task_moved()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  from_cb record;
+  to_cb record;
+begin
+  if new.column_id is distinct from old.column_id then
+    select * into from_cb from public.column_board(old.column_id);
+    select * into to_cb from public.column_board(new.column_id);
+    insert into activity (board_id, user_id, action, task_title, from_column, to_column)
+    values (to_cb.board_id, auth.uid(), 'moved', new.title, from_cb.title, to_cb.title);
+  end if;
+  return new;
+end;
+$$;
+
+create trigger on_task_moved
+  after update on tasks
+  for each row execute function public.log_task_moved();
+
+-- log task deletion
+create or replace function public.log_task_deleted()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare cb record;
+begin
+  select * into cb from public.column_board(old.column_id);
+  if cb.board_id is not null then
+    insert into activity (board_id, user_id, action, task_title, from_column)
+    values (cb.board_id, auth.uid(), 'deleted', old.title, cb.title);
+  end if;
+  return old;
+end;
+$$;
+
+create trigger on_task_deleted
+  after delete on tasks
+  for each row execute function public.log_task_deleted();
+
+alter publication supabase_realtime add table activity;
