@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Pencil, Trash2, Check } from "lucide-react";
 import { useDroppable } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -70,33 +71,55 @@ export function Column({
   }
 
   return (
-    <div className="flex w-[80vw] max-w-72 shrink-0 flex-col rounded-xl bg-slate-100 p-3 sm:w-72">
-      <div className="mb-3 flex items-center justify-between gap-2">
+    <div className="group/col flex w-[80vw] max-w-72 shrink-0 flex-col rounded-card bg-surface-2 p-3 sm:w-72">
+      <div className="mb-3 flex items-center justify-between gap-1 px-1">
         {editing ? (
-          <input
-            autoFocus
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            onBlur={saveTitle}
-            onKeyDown={(e) => e.key === "Enter" && saveTitle()}
-            className="w-full rounded border border-slate-300 px-2 py-1 text-sm outline-none"
-          />
+          <div className="flex w-full items-center gap-1">
+            <input
+              autoFocus
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              onBlur={saveTitle}
+              onKeyDown={(e) => e.key === "Enter" && saveTitle()}
+              className="w-full rounded-control border border-line bg-card px-2 py-1 text-sm text-ink outline-none focus:border-line-strong"
+            />
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={saveTitle}
+              className="rounded p-1 text-ink-2 hover:bg-card hover:text-ink"
+              aria-label="Save"
+            >
+              <Check size={14} strokeWidth={2} />
+            </button>
+          </div>
         ) : (
-          <h3
-            onClick={() => setEditing(true)}
-            className="cursor-pointer text-sm font-semibold text-slate-700"
-          >
-            {column.title}{" "}
-            <span className="font-normal text-slate-400">{tasks.length}</span>
-          </h3>
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <h3 className="truncate text-sm font-medium text-ink">
+              {column.title}
+            </h3>
+            <span className="rounded-full bg-card px-1.5 py-0.5 text-[11px] font-medium text-ink-muted">
+              {tasks.length}
+            </span>
+          </div>
         )}
-        <button
-          onClick={() => setConfirmDeleteColumnOpen(true)}
-          className="shrink-0 rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-red-600"
-          aria-label="Delete column"
-        >
-          ✕
-        </button>
+        {!editing && (
+          <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity duration-150 group-hover/col:opacity-100 focus-within:opacity-100">
+            <button
+              onClick={() => setEditing(true)}
+              className="rounded p-1 text-ink-muted transition-colors duration-150 hover:bg-card hover:text-ink"
+              aria-label="Rename column"
+            >
+              <Pencil size={13} strokeWidth={2} />
+            </button>
+            <button
+              onClick={() => setConfirmDeleteColumnOpen(true)}
+              className="rounded p-1 text-ink-muted transition-colors duration-150 hover:bg-prio-high-bg hover:text-prio-high-ink"
+              aria-label="Delete column"
+            >
+              <Trash2 size={13} strokeWidth={2} />
+            </button>
+          </div>
+        )}
       </div>
 
       <div
@@ -125,8 +148,8 @@ export function Column({
         value={newTask}
         onChange={(e) => setNewTask(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && addTask()}
-        placeholder="+ Add a task"
-        className="mt-2 rounded-lg border border-transparent bg-white/60 px-2 py-1.5 text-sm outline-none placeholder:text-slate-400 focus:border-slate-300 focus:bg-white"
+        placeholder="+  Add a task"
+        className="mt-2 rounded-control border border-transparent bg-transparent px-2 py-2 text-sm text-ink outline-none placeholder:text-ink-muted transition-colors duration-150 hover:bg-card/60 focus:border-line focus:bg-card"
       />
 
       <ConfirmDialog

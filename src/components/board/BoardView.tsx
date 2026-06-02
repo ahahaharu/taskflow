@@ -120,7 +120,7 @@ export function BoardView({
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex flex-1 gap-4 overflow-x-auto pb-4">
+      <div className="flex flex-1 gap-4 overflow-x-auto pb-2">
         {columns.map((column) => (
           <Column
             key={column.id}
@@ -136,8 +136,8 @@ export function BoardView({
             value={newColumn}
             onChange={(e) => setNewColumn(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && addColumn()}
-            placeholder="+ Add a column"
-            className="w-full rounded-xl border border-dashed border-slate-300 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-slate-400 focus:border-slate-400"
+            placeholder="+  Add a column"
+            className="w-full rounded-card border border-dashed border-line-strong bg-transparent px-3 py-2.5 text-sm text-ink outline-none placeholder:text-ink-muted transition-colors duration-150 hover:border-ink-muted focus:border-accent focus:bg-card"
           />
         </div>
       </div>

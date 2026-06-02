@@ -1,16 +1,28 @@
-import type { Task } from "@/types";
+import { AlignLeft, Calendar } from "lucide-react";
+import type { Task, Priority, Profile } from "@/types";
 import { Avatar } from "@/components/shared/Avatar";
-import type { Profile } from "@/types";
 
-const priorityBorder: Record<Task["priority"], string> = {
-  low: "border-l-emerald-400",
-  medium: "border-l-amber-400",
-  high: "border-l-rose-500",
+const priorityPill: Record<Priority, string> = {
+  low: "bg-prio-low-bg text-prio-low-ink",
+  medium: "bg-prio-med-bg text-prio-med-ink",
+  high: "bg-prio-high-bg text-prio-high-ink",
 };
+
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+function isOverdue(iso: string) {
+  const due = new Date(iso);
+  const now = new Date();
+  due.setHours(0, 0, 0, 0);
+  now.setHours(0, 0, 0, 0);
+  return due.getTime() < now.getTime();
+}
 
 export function TaskCardContent({
   task,
-  onDelete,
   dragging = false,
   assignee,
 }: {
@@ -19,28 +31,45 @@ export function TaskCardContent({
   dragging?: boolean;
   assignee?: Profile | null;
 }) {
+  const overdue = task.due_date ? isOverdue(task.due_date) : false;
+  const hasMeta =
+    task.due_date || task.description || assignee || task.priority;
+
   return (
     <div
-      className={`group flex items-start justify-between gap-2 rounded-lg border border-l-4 border-slate-200 bg-white p-3 text-sm shadow-sm ${priorityBorder[task.priority]} ${dragging ? "shadow-lg" : ""}`}
+      className={`rounded-card border border-line bg-card p-3 text-sm transition duration-150 ${dragging ? "shadow-paper-hover" : "shadow-paper hover:border-line-strong hover:shadow-paper-hover"}`}
     >
-      <span className="text-slate-800">{task.title}</span>
-      <div className="flex shrink-0 items-center gap-1">
-        {assignee && (
-          <Avatar name={assignee.name} url={assignee.avatar_url} size="sm" />
-        )}
-        {onDelete && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(task.id);
-            }}
-            className="rounded p-0.5 text-slate-300 opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
-            aria-label="Delete task"
+      <p className="font-medium leading-snug text-ink">{task.title}</p>
+      {hasMeta && (
+        <div className="mt-2.5 flex items-center gap-2 text-[12px] text-ink-2">
+          <span
+            className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium capitalize ${priorityPill[task.priority]}`}
           >
-            ✕
-          </button>
-        )}
-      </div>
+            {task.priority}
+          </span>
+          {task.due_date && (
+            <span
+              className={`inline-flex items-center gap-1 ${overdue ? "text-prio-high-ink" : "text-ink-2"}`}
+            >
+              <Calendar size={12} strokeWidth={2} />
+              {formatDate(task.due_date)}
+            </span>
+          )}
+          {task.description && (
+            <AlignLeft
+              size={12}
+              strokeWidth={2}
+              className="text-ink-muted"
+              aria-label="Has description"
+            />
+          )}
+          <span className="ml-auto">
+            {assignee && (
+              <Avatar name={assignee.name} url={assignee.avatar_url} size="sm" />
+            )}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
