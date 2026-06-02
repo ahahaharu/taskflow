@@ -153,6 +153,7 @@ export function Column({
 
       <div className="relative mt-2">
         <input
+          data-new-task
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && addTask()}
