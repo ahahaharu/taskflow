@@ -4,6 +4,7 @@ import { Comments } from "@/components/task/Comments";
 import { TaskView } from "@/components/task/TaskView";
 import { TaskEditForm } from "@/components/task/TaskEditForm";
 import type { Task } from "@/types";
+import { Attachments } from "@/components/task/Attachments";
 
 export function TaskDetailModal({
   task,
@@ -55,6 +56,7 @@ function TaskDetailContent({
           onClose={onClose}
         />
       )}
+      <Attachments boardId={boardId} taskId={task.id} />
       <Comments taskId={task.id} />
     </div>
   );

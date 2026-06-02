@@ -254,3 +254,27 @@ create policy "avatar_update_own"
   on storage.objects for update
   to authenticated
   using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+  -- ---------- attachments table ----------
+create table attachments (
+  id          uuid primary key default gen_random_uuid(),
+  task_id     uuid not null references tasks(id) on delete cascade,
+  storage_path text not null,
+  file_name   text not null,
+  file_size   bigint not null,
+  mime_type   text,
+  uploaded_by uuid not null references auth.users(id) default auth.uid(),
+  created_at  timestamptz default now()
+);
+
+create index idx_attachments_task on attachments(task_id);
+
+alter table attachments enable row level security;
+
+-- access mirrors tasks: anyone who can access the task can see/add attachments
+create policy "attachments_select" on attachments for select
+  to authenticated using (can_access_task(task_id));
+create policy "attachments_insert" on attachments for insert
+  to authenticated with check (can_access_task(task_id) and uploaded_by = (select auth.uid()));
+create policy "attachments_delete" on attachments for delete
+  to authenticated using (uploaded_by = (select auth.uid()) or can_access_task(task_id));

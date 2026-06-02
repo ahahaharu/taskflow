@@ -41,3 +41,14 @@ export interface Profile {
   name: string | null;
   avatar_url: string | null;
 }
+
+export interface Attachment {
+  id: string;
+  task_id: string;
+  storage_path: string;
+  file_name: string;
+  file_size: number;
+  mime_type: string | null;
+  uploaded_by: string;
+  created_at: string;
+}
