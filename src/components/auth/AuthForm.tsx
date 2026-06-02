@@ -14,7 +14,7 @@ interface AuthFormProps {
 }
 
 const inputClass =
-  "rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-500";
+  "rounded-control border border-line bg-card px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted outline-none transition-colors duration-150 focus:border-line-strong focus:ring-2 focus:ring-accent/15";
 
 export function AuthForm({ mode, onSubmit }: AuthFormProps) {
   const isRegister = mode === "register";
@@ -36,11 +36,11 @@ export function AuthForm({ mode, onSubmit }: AuthFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       {isRegister && (
         <input
           type="text"
-          placeholder="Name"
+          placeholder="Your name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
@@ -49,7 +49,7 @@ export function AuthForm({ mode, onSubmit }: AuthFormProps) {
       )}
       <input
         type="email"
-        placeholder="Email"
+        placeholder="you@example.com"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
@@ -67,9 +67,9 @@ export function AuthForm({ mode, onSubmit }: AuthFormProps) {
       <button
         type="submit"
         disabled={submitting}
-        className="rounded-lg bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+        className="mt-2 rounded-control bg-accent px-4 py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
       >
-        {submitting ? "Please wait…" : isRegister ? "Sign up" : "Sign in"}
+        {submitting ? "Please wait…" : isRegister ? "Create account" : "Sign in"}
       </button>
     </form>
   );
