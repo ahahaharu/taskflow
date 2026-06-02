@@ -11,7 +11,7 @@ function initials(name: string | null | undefined) {
 const sizes = {
   sm: "h-6 w-6 text-[10px]",
   md: "h-8 w-8 text-xs",
-  lg: "h-16 w-16 text-lg",
+  lg: "h-20 w-20 text-xl",
 };
 
 export function Avatar({
@@ -28,13 +28,13 @@ export function Avatar({
       <img
         src={url}
         alt={name ?? "avatar"}
-        className={`${sizes[size]} shrink-0 rounded-full object-cover`}
+        className={`${sizes[size]} shrink-0 rounded-full object-cover ring-1 ring-line`}
       />
     );
   }
   return (
     <div
-      className={`${sizes[size]} flex shrink-0 items-center justify-center rounded-full bg-slate-300 font-medium text-slate-700`}
+      className={`${sizes[size]} flex shrink-0 items-center justify-center rounded-full bg-surface-2 font-medium text-ink-2 ring-1 ring-line`}
     >
       {initials(name)}
     </div>

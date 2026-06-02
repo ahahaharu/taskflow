@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { ChevronLeft, Camera } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   useProfile,
@@ -18,17 +19,29 @@ export function ProfilePage() {
   if (isLoading || !user) return <Spinner fullScreen />;
 
   return (
-    <div className="mx-auto max-w-md p-6">
-      <Link to="/" className="text-sm text-slate-500 hover:underline">
-        ← Back to boards
-      </Link>
-      <h1 className="mb-6 mt-2 text-2xl font-bold text-slate-900">Profile</h1>
-      <ProfileForm
-        key={profile?.id ?? user.id}
-        userId={user.id}
-        profile={profile ?? null}
-        email={user.email}
-      />
+    <div className="min-h-screen bg-paper">
+      <header className="border-b border-line bg-paper">
+        <div className="mx-auto flex max-w-3xl items-center gap-3 px-6 py-4">
+          <Link
+            to="/"
+            aria-label="Back to boards"
+            className="flex h-9 w-9 items-center justify-center rounded-control text-ink-2 transition-colors duration-150 hover:bg-surface-2 hover:text-ink"
+          >
+            <ChevronLeft size={18} strokeWidth={2} />
+          </Link>
+          <h1 className="font-serif text-xl font-semibold tracking-tight text-ink">
+            Profile
+          </h1>
+        </div>
+      </header>
+      <main className="mx-auto max-w-md px-6 py-12">
+        <ProfileForm
+          key={profile?.id ?? user.id}
+          userId={user.id}
+          profile={profile ?? null}
+          email={user.email}
+        />
+      </main>
     </div>
   );
 }
@@ -53,46 +66,49 @@ function ProfileForm({
   }
 
   return (
-    <>
-      <div className="flex flex-col items-center gap-3">
+    <div className="flex flex-col items-center">
+      <button
+        type="button"
+        onClick={() => fileInput.current?.click()}
+        disabled={uploadAvatar.isPending}
+        className="group relative rounded-full focus:outline-none disabled:cursor-wait"
+        aria-label="Change avatar"
+      >
         <Avatar name={profile?.name} url={profile?.avatar_url} size="lg" />
-        <button
-          onClick={() => fileInput.current?.click()}
-          disabled={uploadAvatar.isPending}
-          className="text-sm text-slate-600 hover:underline disabled:opacity-50"
-        >
-          {uploadAvatar.isPending ? "Uploading…" : "Change avatar"}
-        </button>
-        <input
-          ref={fileInput}
-          type="file"
-          accept="image/*"
-          onChange={handleFile}
-          className="hidden"
-        />
-      </div>
+        <span className="absolute inset-0 flex items-center justify-center gap-1.5 rounded-full bg-ink/55 text-xs font-medium text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+          <Camera size={14} strokeWidth={2} />
+          {uploadAvatar.isPending ? "Uploading…" : "Change"}
+        </span>
+      </button>
+      <input
+        ref={fileInput}
+        type="file"
+        accept="image/*"
+        onChange={handleFile}
+        className="hidden"
+      />
+      <p className="mt-3 text-xs text-ink-muted">{email}</p>
 
-      <div className="mt-6">
-        <label className="mb-1 block text-xs font-medium text-slate-500">
+      <div className="mt-10 w-full">
+        <label className="mb-1.5 block text-[10px] font-medium uppercase tracking-wider text-ink-muted">
           Name
         </label>
         <div className="flex gap-2">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+            placeholder="Your name"
+            className="flex-1 rounded-control border border-line bg-card px-3 py-2 text-sm text-ink placeholder:text-ink-muted outline-none transition-colors duration-150 focus:border-line-strong focus:ring-2 focus:ring-accent/15"
           />
           <button
             onClick={() => updateName.mutate(name.trim())}
             disabled={updateName.isPending || !name.trim()}
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+            className="rounded-control bg-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
           >
-            Save
+            {updateName.isPending ? "Saving…" : "Save"}
           </button>
         </div>
       </div>
-
-      <p className="mt-4 text-xs text-slate-400">{email}</p>
-    </>
+    </div>
   );
 }
