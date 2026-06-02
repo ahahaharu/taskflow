@@ -6,8 +6,12 @@ import { useTasks } from "@/hooks/useTasks";
 import { BoardView } from "@/components/board/BoardView";
 import { Spinner } from "@/components/shared/Spinner";
 import { useRealtimeBoard } from "@/hooks/useRealtimeBoard";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { MembersDialog } from "@/components/board/MembersDialog";
+import { BoardToolbar } from "@/components/board/BoardToolbar";
+import { emptyFilters, type BoardFilters } from "@/types/filters";
+import { filterTasks } from "@/utils/filterTasks";
+import { useMembers } from "@/hooks/useMembers";
 
 export function BoardPage() {
   const { boardId } = useParams<{ boardId: string }>();
@@ -18,6 +22,14 @@ export function BoardPage() {
   useRealtimeBoard(boardId!);
 
   const [membersOpen, setMembersOpen] = useState(false);
+  const members = useMembers(boardId!);
+  const [filters, setFilters] = useState<BoardFilters>(emptyFilters);
+
+  const allTasks = useMemo(() => tasks.data ?? [], [tasks.data]);
+  const visibleTasks = useMemo(
+    () => filterTasks(allTasks, filters),
+    [allTasks, filters],
+  );
 
   if (board.isLoading || columns.isLoading || tasks.isLoading)
     return <Spinner fullScreen />;
@@ -52,10 +64,18 @@ export function BoardPage() {
         </div>
       </header>
       <div className="flex flex-1 flex-col overflow-hidden px-4 py-4 sm:px-6">
+        <BoardToolbar
+          filters={filters}
+          onChange={setFilters}
+          onReset={() => setFilters(emptyFilters)}
+          members={members.data ?? []}
+          total={allTasks.length}
+          shown={visibleTasks.length}
+        />
         <BoardView
           boardId={boardId!}
           columns={columns.data ?? []}
-          tasks={tasks.data ?? []}
+          tasks={visibleTasks}
         />
       </div>
       {board.data && (
