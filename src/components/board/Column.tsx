@@ -8,6 +8,7 @@ import {
 import type { Column as ColumnType, Task } from "@/types";
 import { TaskCard } from "@/components/board/TaskCard";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { ButtonSpinner } from "@/components/shared/ButtonSpinner";
 import { useRenameColumn, useDeleteColumn } from "@/hooks/useColumns";
 import { useCreateTask, useDeleteTask } from "@/hooks/useTasks";
 import { useMembers } from "@/hooks/useMembers";
@@ -97,9 +98,15 @@ export function Column({
             <h3 className="truncate text-sm font-medium text-ink">
               {column.title}
             </h3>
-            <span className="rounded-full bg-card px-1.5 py-0.5 text-[11px] font-medium text-ink-muted">
-              {tasks.length}
-            </span>
+            {renameColumn.isPending ? (
+              <span className="text-ink-muted">
+                <ButtonSpinner size={12} />
+              </span>
+            ) : (
+              <span className="rounded-full bg-card px-1.5 py-0.5 text-[11px] font-medium text-ink-muted">
+                {tasks.length}
+              </span>
+            )}
           </div>
         )}
         {!editing && (
@@ -144,13 +151,21 @@ export function Column({
         </SortableContext>
       </div>
 
-      <input
-        value={newTask}
-        onChange={(e) => setNewTask(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && addTask()}
-        placeholder="+  Add a task"
-        className="mt-2 rounded-control border border-transparent bg-transparent px-2 py-2 text-sm text-ink outline-none placeholder:text-ink-muted transition-colors duration-150 hover:bg-card/60 focus:border-line focus:bg-card"
-      />
+      <div className="relative mt-2">
+        <input
+          value={newTask}
+          onChange={(e) => setNewTask(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && addTask()}
+          disabled={createTask.isPending}
+          placeholder="+  Add a task"
+          className="w-full rounded-control border border-transparent bg-transparent px-2 py-2 pr-8 text-sm text-ink outline-none placeholder:text-ink-muted transition-colors duration-150 hover:bg-card/60 focus:border-line focus:bg-card disabled:opacity-50"
+        />
+        {createTask.isPending && (
+          <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-muted">
+            <ButtonSpinner />
+          </span>
+        )}
+      </div>
 
       <ConfirmDialog
         open={confirmDeleteColumnOpen}

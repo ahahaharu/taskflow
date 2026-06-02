@@ -15,6 +15,7 @@ import type { Column as ColumnType, Task } from "@/types";
 import type { TaskPositionUpdate } from "@/services/tasks";
 import { Column } from "@/components/board/Column";
 import { TaskCardContent } from "@/components/board/TaskCardContent";
+import { ButtonSpinner } from "@/components/shared/ButtonSpinner";
 import { useCreateColumn } from "@/hooks/useColumns";
 import { useMoveTasks } from "@/hooks/useTasks";
 import { TaskDetailModal } from "../task/TaskDetailModal";
@@ -132,13 +133,21 @@ export function BoardView({
         ))}
 
         <div className="w-72 shrink-0">
-          <input
-            value={newColumn}
-            onChange={(e) => setNewColumn(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && addColumn()}
-            placeholder="+  Add a column"
-            className="w-full rounded-card border border-dashed border-line-strong bg-transparent px-3 py-2.5 text-sm text-ink outline-none placeholder:text-ink-muted transition-colors duration-150 hover:border-ink-muted focus:border-accent focus:bg-card"
-          />
+          <div className="relative">
+            <input
+              value={newColumn}
+              onChange={(e) => setNewColumn(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && addColumn()}
+              disabled={createColumn.isPending}
+              placeholder="+  Add a column"
+              className="w-full rounded-card border border-dashed border-line-strong bg-transparent px-3 py-2.5 pr-9 text-sm text-ink outline-none placeholder:text-ink-muted transition-colors duration-150 hover:border-ink-muted focus:border-accent focus:bg-card disabled:opacity-50"
+            />
+            {createColumn.isPending && (
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted">
+                <ButtonSpinner />
+              </span>
+            )}
+          </div>
         </div>
       </div>
 

@@ -7,6 +7,7 @@ import {
 } from "@/hooks/useAttachments";
 import { getAttachmentUrl } from "@/services/attachments";
 import { useAuth } from "@/hooks/useAuth";
+import { ButtonSpinner } from "@/components/shared/ButtonSpinner";
 import type { Attachment } from "@/types";
 import toast from "react-hot-toast";
 
@@ -55,7 +56,11 @@ export function Attachments({
           disabled={upload.isPending}
           className="flex items-center gap-1.5 rounded-control px-2 py-1 text-sm text-ink-2 transition-colors duration-150 hover:bg-surface-2 hover:text-ink disabled:opacity-50"
         >
-          <Paperclip size={14} strokeWidth={2} />
+          {upload.isPending ? (
+            <ButtonSpinner />
+          ) : (
+            <Paperclip size={14} strokeWidth={2} />
+          )}
           {upload.isPending ? "Uploading…" : "Attach"}
         </button>
         <input
@@ -98,15 +103,21 @@ export function Attachments({
             >
               <Download size={14} strokeWidth={2} />
             </button>
-            {att.uploaded_by === user?.id && (
-              <button
-                onClick={() => remove.mutate(att)}
-                className="shrink-0 rounded p-1 text-ink-muted opacity-0 transition hover:text-prio-high-ink group-hover:opacity-100"
-                aria-label="Delete attachment"
-              >
-                <Trash2 size={14} strokeWidth={2} />
-              </button>
-            )}
+            {att.uploaded_by === user?.id &&
+              (remove.isPending && remove.variables?.id === att.id ? (
+                <span className="flex shrink-0 items-center p-1 text-ink-muted">
+                  <ButtonSpinner />
+                </span>
+              ) : (
+                <button
+                  onClick={() => remove.mutate(att)}
+                  disabled={remove.isPending}
+                  className="shrink-0 rounded p-1 text-ink-muted opacity-0 transition hover:text-prio-high-ink group-hover:opacity-100 disabled:opacity-50"
+                  aria-label="Delete attachment"
+                >
+                  <Trash2 size={14} strokeWidth={2} />
+                </button>
+              ))}
           </li>
         ))}
       </ul>

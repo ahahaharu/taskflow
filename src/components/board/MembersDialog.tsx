@@ -3,6 +3,7 @@ import { UserPlus, X } from "lucide-react";
 import { Modal } from "@/components/shared/Modal";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Avatar } from "@/components/shared/Avatar";
+import { ButtonSpinner } from "@/components/shared/ButtonSpinner";
 import { useAuth } from "@/hooks/useAuth";
 import {
   useBoardMembersDetailed,
@@ -71,16 +72,18 @@ export function MembersDialog({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleInvite()}
+                    disabled={invite.isPending}
                     placeholder="someone@example.com"
-                    className="w-full rounded-control border border-line bg-card pl-9 pr-3 py-2 text-sm text-ink placeholder:text-ink-muted outline-none transition-colors duration-150 focus:border-line-strong focus:ring-2 focus:ring-accent/15"
+                    className="w-full rounded-control border border-line bg-card pl-9 pr-3 py-2 text-sm text-ink placeholder:text-ink-muted outline-none transition-colors duration-150 focus:border-line-strong focus:ring-2 focus:ring-accent/15 disabled:opacity-50"
                   />
                 </div>
                 <button
                   onClick={handleInvite}
                   disabled={invite.isPending}
-                  className="rounded-control bg-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-control bg-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
                 >
-                  {invite.isPending ? "…" : "Invite"}
+                  {invite.isPending && <ButtonSpinner />}
+                  {invite.isPending ? "Inviting…" : "Invite"}
                 </button>
               </div>
             </div>
@@ -118,15 +121,22 @@ export function MembersDialog({
                         {m.role}
                       </span>
                     </div>
-                    {isOwner && !isOwnerRole && (
-                      <button
-                        onClick={() => remove.mutate(m.id)}
-                        className="shrink-0 rounded-control p-1.5 text-ink-muted opacity-0 transition-colors duration-150 hover:bg-prio-high-bg hover:text-prio-high-ink group-hover:opacity-100 focus-visible:opacity-100"
-                        aria-label="Remove member"
-                      >
-                        <X size={14} strokeWidth={2} />
-                      </button>
-                    )}
+                    {isOwner &&
+                      !isOwnerRole &&
+                      (remove.isPending && remove.variables === m.id ? (
+                        <span className="flex shrink-0 items-center p-1.5 text-ink-muted">
+                          <ButtonSpinner />
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => remove.mutate(m.id)}
+                          disabled={remove.isPending}
+                          className="shrink-0 rounded-control p-1.5 text-ink-muted opacity-0 transition-colors duration-150 hover:bg-prio-high-bg hover:text-prio-high-ink group-hover:opacity-100 focus-visible:opacity-100 disabled:opacity-50"
+                          aria-label="Remove member"
+                        >
+                          <X size={14} strokeWidth={2} />
+                        </button>
+                      ))}
                   </li>
                 );
               })}
@@ -147,8 +157,9 @@ export function MembersDialog({
               <button
                 onClick={() => setConfirmDeleteBoardOpen(true)}
                 disabled={deleteBoard.isPending}
-                className="w-full rounded-control border border-prio-high-bg px-4 py-2 text-sm font-medium text-prio-high-ink transition-colors duration-150 hover:bg-prio-high-bg disabled:opacity-50"
+                className="flex w-full items-center justify-center gap-1.5 rounded-control border border-prio-high-bg px-4 py-2 text-sm font-medium text-prio-high-ink transition-colors duration-150 hover:bg-prio-high-bg disabled:opacity-50"
               >
+                {deleteBoard.isPending && <ButtonSpinner />}
                 {deleteBoard.isPending ? "Deleting…" : "Delete board"}
               </button>
             </div>

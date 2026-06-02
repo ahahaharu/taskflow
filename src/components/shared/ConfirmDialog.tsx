@@ -1,5 +1,6 @@
 import { AlertTriangle } from "lucide-react";
 import { Modal } from "@/components/shared/Modal";
+import { ButtonSpinner } from "@/components/shared/ButtonSpinner";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -39,9 +40,10 @@ export function ConfirmDialog({
         <button
           onClick={onConfirm}
           disabled={loading}
-          className="rounded-control bg-danger px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-[#7f1d1d] disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-control bg-danger px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-[#7f1d1d] disabled:opacity-50"
         >
-          {loading ? "…" : confirmLabel}
+          {loading && <ButtonSpinner />}
+          {confirmLabel}
         </button>
       </div>
     </Modal>

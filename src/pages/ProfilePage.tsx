@@ -10,6 +10,7 @@ import {
 } from "@/hooks/useProfile";
 import { Avatar } from "@/components/shared/Avatar";
 import { Spinner } from "@/components/shared/Spinner";
+import { ButtonSpinner } from "@/components/shared/ButtonSpinner";
 import type { Profile } from "@/types";
 
 export function ProfilePage() {
@@ -75,8 +76,16 @@ function ProfileForm({
         aria-label="Change avatar"
       >
         <Avatar name={profile?.name} url={profile?.avatar_url} size="lg" />
-        <span className="absolute inset-0 flex items-center justify-center gap-1.5 rounded-full bg-ink/55 text-xs font-medium text-white opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
-          <Camera size={14} strokeWidth={2} />
+        <span
+          className={`absolute inset-0 flex items-center justify-center gap-1.5 rounded-full bg-ink/55 text-xs font-medium text-white transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 ${
+            uploadAvatar.isPending ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          {uploadAvatar.isPending ? (
+            <ButtonSpinner />
+          ) : (
+            <Camera size={14} strokeWidth={2} />
+          )}
           {uploadAvatar.isPending ? "Uploading…" : "Change"}
         </span>
       </button>
@@ -97,14 +106,16 @@ function ProfileForm({
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
+            disabled={updateName.isPending}
             placeholder="Your name"
-            className="flex-1 rounded-control border border-line bg-card px-3 py-2 text-sm text-ink placeholder:text-ink-muted outline-none transition-colors duration-150 focus:border-line-strong focus:ring-2 focus:ring-accent/15"
+            className="flex-1 rounded-control border border-line bg-card px-3 py-2 text-sm text-ink placeholder:text-ink-muted outline-none transition-colors duration-150 focus:border-line-strong focus:ring-2 focus:ring-accent/15 disabled:opacity-50"
           />
           <button
             onClick={() => updateName.mutate(name.trim())}
             disabled={updateName.isPending || !name.trim()}
-            className="rounded-control bg-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-control bg-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
           >
+            {updateName.isPending && <ButtonSpinner />}
             {updateName.isPending ? "Saving…" : "Save"}
           </button>
         </div>

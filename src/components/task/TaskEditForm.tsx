@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMembers } from "@/hooks/useMembers";
 import { useUpdateTask } from "@/hooks/useTasks";
+import { ButtonSpinner } from "@/components/shared/ButtonSpinner";
 import type { Task, Priority } from "@/types";
 
 const priorities: Priority[] = ["low", "medium", "high"];
@@ -118,8 +119,9 @@ export function TaskEditForm({
         <button
           onClick={handleSave}
           disabled={updateTask.isPending}
-          className="rounded-control bg-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-control bg-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
         >
+          {updateTask.isPending && <ButtonSpinner />}
           {updateTask.isPending ? "Saving…" : "Save"}
         </button>
       </div>

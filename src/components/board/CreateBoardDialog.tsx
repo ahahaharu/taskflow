@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Modal } from "@/components/shared/Modal";
+import { ButtonSpinner } from "@/components/shared/ButtonSpinner";
 import { useCreateBoard } from "@/hooks/useBoards";
 
 export function CreateBoardDialog() {
@@ -37,7 +38,8 @@ export function CreateBoardDialog() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-          className="w-full rounded-control border border-line bg-card px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted outline-none transition-colors duration-150 focus:border-line-strong focus:ring-2 focus:ring-accent/15"
+          disabled={createBoard.isPending}
+          className="w-full rounded-control border border-line bg-card px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted outline-none transition-colors duration-150 focus:border-line-strong focus:ring-2 focus:ring-accent/15 disabled:opacity-50"
         />
         <div className="mt-6 flex justify-end gap-2">
           <button
@@ -49,8 +51,9 @@ export function CreateBoardDialog() {
           <button
             onClick={handleCreate}
             disabled={createBoard.isPending}
-            className="rounded-control bg-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-control bg-accent px-4 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
           >
+            {createBoard.isPending && <ButtonSpinner />}
             {createBoard.isPending ? "Creating…" : "Create"}
           </button>
         </div>

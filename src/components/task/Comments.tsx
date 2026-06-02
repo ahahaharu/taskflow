@@ -8,6 +8,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useRealtimeComments } from "@/hooks/useRealtimeComments";
 import { Avatar } from "@/components/shared/Avatar";
+import { ButtonSpinner } from "@/components/shared/ButtonSpinner";
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleString(undefined, {
@@ -64,15 +65,21 @@ export function Comments({ taskId }: { taskId: string }) {
                 {c.content}
               </p>
             </div>
-            {c.user_id === user?.id && (
-              <button
-                onClick={() => deleteComment.mutate(c.id)}
-                className="h-7 shrink-0 rounded p-1 text-ink-muted opacity-0 transition-colors duration-150 hover:text-prio-high-ink group-hover:opacity-100 focus-visible:opacity-100"
-                aria-label="Delete comment"
-              >
-                <Trash2 size={13} strokeWidth={2} />
-              </button>
-            )}
+            {c.user_id === user?.id &&
+              (deleteComment.isPending && deleteComment.variables === c.id ? (
+                <span className="flex h-7 shrink-0 items-center p-1 text-ink-muted">
+                  <ButtonSpinner size={13} />
+                </span>
+              ) : (
+                <button
+                  onClick={() => deleteComment.mutate(c.id)}
+                  disabled={deleteComment.isPending}
+                  className="h-7 shrink-0 rounded p-1 text-ink-muted opacity-0 transition-colors duration-150 hover:text-prio-high-ink group-hover:opacity-100 focus-visible:opacity-100 disabled:opacity-50"
+                  aria-label="Delete comment"
+                >
+                  <Trash2 size={13} strokeWidth={2} />
+                </button>
+              ))}
           </div>
         ))}
       </div>
@@ -82,8 +89,9 @@ export function Comments({ taskId }: { taskId: string }) {
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+          disabled={addComment.isPending}
           placeholder="Write a comment…"
-          className="flex-1 rounded-control border border-line bg-card px-3 py-2 text-sm text-ink placeholder:text-ink-muted outline-none transition-colors duration-150 focus:border-line-strong focus:ring-2 focus:ring-accent/15"
+          className="flex-1 rounded-control border border-line bg-card px-3 py-2 text-sm text-ink placeholder:text-ink-muted outline-none transition-colors duration-150 focus:border-line-strong focus:ring-2 focus:ring-accent/15 disabled:opacity-50"
         />
         <button
           onClick={handleAdd}
@@ -91,7 +99,11 @@ export function Comments({ taskId }: { taskId: string }) {
           className="flex items-center gap-1.5 rounded-control bg-accent px-3 py-2 text-sm font-medium text-white transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
           aria-label="Send"
         >
-          <Send size={14} strokeWidth={2} />
+          {addComment.isPending ? (
+            <ButtonSpinner />
+          ) : (
+            <Send size={14} strokeWidth={2} />
+          )}
         </button>
       </div>
     </div>
